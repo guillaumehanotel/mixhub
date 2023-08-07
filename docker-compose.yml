@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+    nginx:
+        image: nginx:stable-alpine
+        container_name: mixhub_nginx
+        ports:
+            - "80:80"
+        volumes:
+            - './:/var/www/html'
+            - './docker/nginx/dev.nginx:/etc/nginx/conf.d/default.conf'
+
+        depends_on:
+            - php
+            - mysql
+        networks:
+            - mixhub_laravel
+    supervisor:
+        container_name: mixhub_supervisor
+        build:
+            context: ./docker/
+            dockerfile: Supervisor.Dockerfile
+            args:
+                user: mixhub
+                uid: 1000
+        image: laravel-8.2/supervisor
+        restart: unless-stopped
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - mixhub_laravel
+        depends_on:
+            - php
+    php:
+        container_name: mixhub_php
+        build:
+            context: ./docker/
+            dockerfile: App.Dev.Dockerfile
+            args:
+                user: mixhub
+                uid: 1000
+        image: laravel-8.2/app
+        ports:
+            - "9000:9000"
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - mixhub_laravel
+        depends_on:
+            - mysql
+            - redis
+        extra_hosts:
+            - host.docker.internal:host-gateway
+    mysql:
+        container_name: mixhub_mysql
+        image: 'mysql:8.0'
+        ports:
+            - '${FORWARD_DB_PORT:-3306}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            - 'mixhub_mysql:/var/lib/mysql'
+        networks:
+            - mixhub_laravel
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping" ]
+    mysql_test:
+        container_name: mixhub_mysql_test
+        image: 'mysql:8.0'
+        ports:
+            - '${FORWARD_DB_PORT:-3307}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            - 'mixhub_mysql_test:/var/lib/mysql'
+        networks:
+            - mixhub_laravel
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping" ]
+    redis:
+        container_name: mixhub_redis
+        image: 'redis:latest'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'mixhub_redis:/data'
+        networks:
+            - mixhub_laravel
+    laravel-echo-server:
+        container_name: mixhub_laravel-echo-server
+        image: oanhnn/laravel-echo-server:latest
+        depends_on:
+            - redis
+        environment:
+            LARAVEL_ECHO_SERVER_DB: redis
+            LARAVEL_ECHO_SERVER_DEBUG: 'true'
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+        networks:
+            - mixhub_laravel
+        ports:
+            - "6001:6001"
+        restart: unless-stopped
+        healthcheck:
+            test: node /usr/local/src/healthcheck.js
+            start_period: 5s
+            interval: 3s
+            timeout: 3s
+            retries: 10
+    npm:
+        image: node:15.0
+        container_name: mixhub_npm
+        volumes:
+            - ./:/var/www/html
+        working_dir: /var/www/html
+        entrypoint: [ 'npm' ]
+        networks:
+            - mixhub_laravel
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: mixhub_phpmyadmin
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+        restart: always
+        depends_on:
+            - mysql
+        ports:
+            - "8081:80"
+        networks:
+            - mixhub_laravel
+    mailpit:
+        container_name: mixhub_mailpit
+        image: 'axllent/mailpit:latest'
+        ports:
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - mixhub_laravel
+
+networks:
+    mixhub_laravel:
+        driver: bridge
+volumes:
+    mixhub_mysql:
+        driver: local
+    mixhub_mysql_test:
+        driver: local
+    mixhub_redis:
+        driver: local
