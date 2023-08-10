@@ -1,35 +1,114 @@
-import { useState } from 'react';
-import { Link } from '@inertiajs/react';
+import {useState} from 'react';
+import {Link} from '@inertiajs/react';
 
-export default function Authenticated({ user, header, children }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+export default function Authenticated({user, header, children}) {
+    const [isCollapsed, setIsCollapsed] = useState(true);  // Start with the menu collapsed
+    const [isLocked, setIsLocked] = useState(false);       // Lock state for the menu
 
+    const handleLinkClick = (e) => {
+        e.stopPropagation();
+    };
+
+    const handleMenuHover = () => {
+        if (isCollapsed && !isLocked) {
+            setIsCollapsed(false);  // Expand the menu when hovered over, only if it's collapsed and not locked
+        }
+    };
+
+    const handleMenuLeave = () => {
+        if (!isCollapsed && !isLocked) {
+            setIsCollapsed(true);  // Collapse the menu when the mouse leaves, only if it was expanded due to hover and not locked
+        }
+    };
+
+    const handleMenuClick = () => {
+        if (isCollapsed) {
+            setIsCollapsed(false); // If menu is collapsed, expand it on click
+        } else {
+            setIsLocked(!isLocked); // If menu is not collapsed, toggle the lock state
+        }
+    };
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
 
-            <ul className="menu bg-base-200 w-56 !min-h-screen">
-                <li>
-                    <a>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                        Item 2
-                    </a>
-                </li>
-                <li>
-                    <a>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        Item 1
-                    </a>
-                </li>
-                <li>
-                    <a>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                        Item 3
-                    </a>
-                </li>
+            <ul className={`menu bg-base-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-56'} h-screen fixed left-0 text-lg flex flex-col justify-between`}
+                onMouseEnter={handleMenuHover}
+                onMouseLeave={handleMenuLeave}
+                onClick={handleMenuClick}
+            >
+                <div>
+                    <li className="h-12">
+                        <a onClick={handleLinkClick}>
+                            <i className="fa-solid fa-chart-line w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Dashboard</span>
+                        </a>
+                    </li>
+                    <li className="h-12">
+                        <a onClick={handleLinkClick}>
+                            <i className="fas fa-pizza-slice w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Recettes</span>
+                        </a>
+                    </li>
+                    <li className="h-12">
+                        <a onClick={handleLinkClick}>
+                            <i className="fa-solid fa-house w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Loisirs</span>
+                        </a>
+                    </li>
+                    <li className="h-12">
+                        <a onClick={handleLinkClick}>
+                            <i className="fa-solid fa-coins w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
+                                Finances</span>
+                        </a>
+                    </li>
+                    <li className={isCollapsed ? 'collapsed' : ''}>
+                        <a onClick={handleLinkClick}>
+                            <i className="fa-solid fa-link w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
+                                Favoris</span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a onClick={handleLinkClick}>
+                                    <span className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Administratif</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a onClick={handleLinkClick}>
+                                    <span className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>QDV</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </div>
+
+                <div>
+                    <li className="h-12">
+                        <Link href={route('profile.edit')} onClick={handleLinkClick}>
+                            <i className="fa-solid fa-user w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Profil</span>
+                        </Link>
+                    </li>
+                    <li className="h-12">
+                        <Link href={route('logout')} onClick={handleLinkClick}>
+                            <i className="fa-solid fa-sign-out w-5 mr-3"></i>
+                            <span
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Logout</span>
+                        </Link>
+                    </li>
+                </div>
+
             </ul>
 
+            <main className="min-h-screen flex-grow transition-all duration-300" style={{ marginLeft: isCollapsed ? '4rem' : '14rem' }}>{children}</main>
 
-            <main>{children}</main>
         </div>
     );
 }

@@ -25,6 +25,13 @@ Route::get('/', function () {
     ]);
 });
 
+Route::group(['prefix' => 'favoris', 'as' => 'bookmarks.'], function () {
+   Route::get('/', [\App\Http\Controllers\BookmarkController::class, 'index'])->name('index');
+
+
+});
+
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
