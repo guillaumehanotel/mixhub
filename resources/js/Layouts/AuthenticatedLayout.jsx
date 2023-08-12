@@ -4,6 +4,7 @@ import {Link, usePage} from '@inertiajs/react';
 export default function Authenticated({user, children}) {
     const {bookmarkCategories} = usePage().props;
     const backgroundImage = user.background_image_url;
+    console.log(backgroundImage);
 
     const [isCollapsed, setIsCollapsed] = useState(() => {
         const savedState = localStorage.getItem('isCollapsed');

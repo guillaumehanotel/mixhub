@@ -58,10 +58,9 @@ class ProfileController extends Controller
         // Stockez l'image et récupérez le chemin.
         $path = $request->file('background')->store('user-backgrounds', 'public');
 
-        Log::debug($path);
         // Mettez à jour le modèle utilisateur.
         $user->update([
-            'background_image_url' => 'storage/' . $path,
+            'background_image_url' => '/storage/' . $path,
         ]);
 
         return Redirect::route('profile.edit')->with('success', 'Image de fond mise à jour avec succès.');
