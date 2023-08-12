@@ -39,6 +39,9 @@ class HandleInertiaRequests extends Middleware
                     'location' => $request->url(),
                 ]);
             },
+            'bookmarkCategories' => fn () => $request->user()
+                ? $request->user()->bookmarkCategories()->get()
+                : collect(),
         ]);
     }
 }

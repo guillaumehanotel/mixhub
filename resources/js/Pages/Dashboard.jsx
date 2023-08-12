@@ -9,7 +9,6 @@ export default function Dashboard({ auth }) {
             <Head title="Dashboard" />
 
 
-            <p>coucou</p>
 
 
         </AuthenticatedLayout>

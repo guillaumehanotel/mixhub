@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,21 +27,27 @@ Route::get('/', function () {
     ]);
 });
 
-Route::group(['prefix' => 'favoris', 'as' => 'bookmarks.'], function () {
-   Route::get('/', [\App\Http\Controllers\BookmarkController::class, 'index'])->name('index');
 
-
-});
-
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/upload-background', [ProfileController::class, 'uploadBackground'])->name('profile.upload-background');
+
+
+    Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
+
+
+    Route::group(['prefix' => 'favoris', 'as' => 'bookmarks.'], function () {
+        Route::get('/', [BookmarkController::class, 'index'])->name('index');
+        Route::get('{bookmarkCategory}', [BookmarkController::class, 'show'])->name('show');
+    });
+
+
+
+
+
 });
 
 require __DIR__.'/auth.php';

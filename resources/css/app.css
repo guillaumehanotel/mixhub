@@ -6,7 +6,6 @@
 
 main {
     height: fit-content;
-    background-image: url("images/kate-hazen-fractal-mountains.png");
     background-size: cover;
     background-position: center;
 }

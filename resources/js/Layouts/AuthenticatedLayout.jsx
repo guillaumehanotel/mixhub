@@ -1,9 +1,24 @@
-import {useState} from 'react';
-import {Link} from '@inertiajs/react';
+import {useEffect, useState} from 'react';
+import {Link, usePage} from '@inertiajs/react';
 
-export default function Authenticated({user, header, children}) {
-    const [isCollapsed, setIsCollapsed] = useState(true);  // Start with the menu collapsed
-    const [isLocked, setIsLocked] = useState(false);       // Lock state for the menu
+export default function Authenticated({user, children}) {
+    const {bookmarkCategories} = usePage().props;
+    const backgroundImage = user.background_image_url;
+
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+        const savedState = localStorage.getItem('isCollapsed');
+        return savedState !== null ? JSON.parse(savedState) : true;
+    });
+
+    const [isLocked, setIsLocked] = useState(() => {
+        const savedLockState = localStorage.getItem('isLocked');
+        return savedLockState !== null ? JSON.parse(savedLockState) : false;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('isCollapsed', JSON.stringify(isCollapsed));
+        localStorage.setItem('isLocked', JSON.stringify(isLocked));
+    }, [isCollapsed, isLocked]);
 
     const handleLinkClick = (e) => {
         e.stopPropagation();
@@ -38,11 +53,11 @@ export default function Authenticated({user, header, children}) {
             >
                 <div>
                     <li className="h-12">
-                        <a onClick={handleLinkClick}>
+                        <Link href={route('dashboard')} onClick={handleLinkClick}>
                             <i className="fa-solid fa-chart-line w-5 mr-3"></i>
                             <span
                                 className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Dashboard</span>
-                        </a>
+                        </Link>
                     </li>
                     <li className="h-12">
                         <a onClick={handleLinkClick}>
@@ -67,23 +82,23 @@ export default function Authenticated({user, header, children}) {
                         </a>
                     </li>
                     <li className={isCollapsed ? 'collapsed' : ''}>
-                        <a onClick={handleLinkClick}>
+                        <Link href={route('bookmarks.index')} onClick={handleLinkClick}>
                             <i className="fa-solid fa-link w-5 mr-3"></i>
                             <span
                                 className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
                                 Favoris</span>
-                        </a>
+                        </Link>
                         <ul>
-                            <li>
-                                <a onClick={handleLinkClick}>
-                                    <span className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Administratif</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a onClick={handleLinkClick}>
-                                    <span className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>QDV</span>
-                                </a>
-                            </li>
+                            {bookmarkCategories && bookmarkCategories.map(category => (
+                                <li key={category.id}>
+                                    <Link href={route('bookmarks.show', category.slug)} onClick={handleLinkClick}>
+                                    <span
+                                        className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
+                                        {category.name}
+                                    </span>
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </li>
                 </div>
@@ -100,14 +115,22 @@ export default function Authenticated({user, header, children}) {
                         <Link href={route('logout')} onClick={handleLinkClick}>
                             <i className="fa-solid fa-sign-out w-5 mr-3"></i>
                             <span
-                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Logout</span>
+                                className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Déconnexion</span>
                         </Link>
                     </li>
                 </div>
 
             </ul>
 
-            <main className="min-h-screen flex-grow transition-all duration-300" style={{ marginLeft: isCollapsed ? '4rem' : '14rem' }}>{children}</main>
+            <main
+                className="min-h-screen flex-grow transition-all duration-300"
+                style={{
+                    marginLeft: isCollapsed ? '4rem' : '14rem',
+                    backgroundImage: `url(${backgroundImage})`,
+            }}
+            >
+                {children}
+            </main>
 
         </div>
     );
