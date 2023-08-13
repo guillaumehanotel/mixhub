@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookmarkCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

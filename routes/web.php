@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookmarkCategoryController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -44,6 +45,12 @@ Route::middleware('auth')->group(function () {
         Route::get('{bookmarkCategory}', [BookmarkController::class, 'show'])->name('show');
     });
 
+    Route::group(['prefix' => 'bookmark-categories', 'as' => 'bookmark-categories.'], function () {
+        Route::post('/', [BookmarkCategoryController::class, 'store'])->name('store');
+        Route::put('{id}', [BookmarkCategoryController::class, 'update'])->name('update');
+        Route::delete('{id}', [BookmarkCategoryController::class, 'destroy'])->name('destroy');
+
+    });
 
 
 

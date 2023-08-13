@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --bc: 220 13% 69%;
+}
+
 main {
     height: fit-content;
     background-size: cover;
@@ -12,4 +16,41 @@ main {
 
 .collapsed ul::before {
     content: none;
+}
+
+.active-link {
+    background-color: hsl(var(--bc) / 0.1);
+}
+
+.context-menu {
+    position: absolute;
+    z-index: 50;
+    width: 150px;
+    background-color: #f9f9f9;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.context-menu button {
+    background-color: transparent;
+    padding: 8px 12px;
+    border: none;
+    text-align: left;
+    width: 100%;
+    font-size: 16px;
+    color: #333;
+    transition: background-color 0.3s ease;
+    border-top: 1px solid #eaeaea;
+}
+
+.context-menu button:first-child {
+    border-top: none;
+}
+
+.context-menu button:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
 }

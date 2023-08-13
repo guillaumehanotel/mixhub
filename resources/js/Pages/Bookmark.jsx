@@ -4,23 +4,6 @@ import { Head } from '@inertiajs/react';
 export default function Bookmark({ auth, bookmarks }) {
 
 
-    function handleDrop(event) {
-        event.preventDefault();
-
-        const url = event.dataTransfer.getData('URL');
-        const title = event.dataTransfer.getData('Text');
-
-        console.log(url, title)
-    }
-
-    function handleDragOver(event) {
-        event.preventDefault();
-    }
-
-    function handleDragEnter(event) {
-        event.preventDefault();
-    }
-
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -28,11 +11,7 @@ export default function Bookmark({ auth, bookmarks }) {
             <Head title="Favoris" />
 
 
-            <div className="flex flex-row flex-wrap -m-2.5 pt-12 mx-28"
-                 onDrop={handleDrop}
-                 onDragOver={handleDragOver}
-                 onDragEnter={handleDragEnter}
-            >
+            <div className="flex flex-row flex-wrap -m-2.5 pt-12 mx-28">
                 {bookmarks.map(bookmark => (
                     <div key={bookmark.id} className="mx-4 w-36">
 
