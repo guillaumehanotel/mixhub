@@ -1,12 +1,16 @@
-import {useEffect, useRef, useState} from 'react';
-import {Link, usePage} from '@inertiajs/react';
-import {router} from '@inertiajs/react'
+import {useContext, useEffect, useState} from 'react';
+import {Link, router, usePage} from '@inertiajs/react';
+import DragDropContext from '@/contexts/DragDropContext';
 
 
-export default function Authenticated({user, children}) {
+export default function Authenticated({user, children, errors}) {
     const {bookmarkCategories} = usePage().props;
     const backgroundImage = user.background_image_url;
     const url = usePage().props.ziggy.location;
+
+    const {draggedItem, setDraggedItem} = useContext(DragDropContext);
+    const [overDropTarget, setOverDropTarget] = useState(false);
+
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -31,6 +35,24 @@ export default function Authenticated({user, children}) {
         y: 0,
         categoryId: null,
     });
+
+    const handleDrop = async (e, categoryId) => {
+        if (draggedItem) {
+            await router.put(`/favoris/${draggedItem}`, {
+                bookmark_category_id: categoryId,
+            });
+            setDraggedItem(null);
+            setOverDropTarget(false);
+        }
+    };
+    const handleDragOver = (e, categoryId) => {
+        e.preventDefault();
+        setOverDropTarget(categoryId);
+    };
+
+    const handleDragLeave = () => {
+        setOverDropTarget(false);
+    };
 
     useEffect(() => {
         localStorage.setItem('isCollapsed', JSON.stringify(isCollapsed));
@@ -130,6 +152,7 @@ export default function Authenticated({user, children}) {
     }, []);
 
     return (
+
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
 
             <ul className={`menu bg-base-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-60'} h-screen fixed left-0 text-lg flex flex-col justify-between`}
@@ -185,7 +208,13 @@ export default function Authenticated({user, children}) {
                                 </button>
                             </li>
                             {bookmarkCategories && bookmarkCategories.map(category => (
-                                <li key={category.id} onContextMenu={(e) => handleContextMenu(e, category.id)}>
+                                <li key={category.id}
+                                    onDrop={(e) => handleDrop(e, category.id)}
+                                    onDragOver={(e) => handleDragOver(e, category.id)}
+                                    onDragLeave={(e) => handleDragLeave(e)}
+                                    onContextMenu={(e) => handleContextMenu(e, category.id)}
+                                    className={`${overDropTarget === category.id ? 'drop-target' : ''}`}
+                                >
                                     <Link href={route('bookmarks.show', category.slug)}
                                           className={!isCollapsed && url.includes(category.slug) ? 'active-link' : ''}
                                           onClick={handleLinkClick}>
@@ -253,8 +282,10 @@ export default function Authenticated({user, children}) {
                 )}
 
                 {editCategoryId && (
-                    <dialog className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 text-black rounded-lg">
-                        <form method={'dialog'} className="bg-white rounded-lg shadow-md p-6 space-y-4" onSubmit={handleUpdateCategory}>
+                    <dialog
+                        className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 text-black rounded-lg">
+                        <form method={'dialog'} className="bg-white rounded-lg shadow-md p-6 space-y-4"
+                              onSubmit={handleUpdateCategory}>
                             <h3 className={'font-bold text-lg'}>Renommer la catégorie</h3>
                             <input
                                 value={editCategoryName}
@@ -264,7 +295,8 @@ export default function Authenticated({user, children}) {
                             />
                             <div className="flex justify-end space-x-2">
                                 <button type="submit"
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Mettre à jour
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Mettre
+                                    à jour
                                 </button>
                                 <button type="button" className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
                                         onClick={() => setEditCategoryId(null)}>Annuler

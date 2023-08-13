@@ -14,7 +14,7 @@ class Bookmark extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'title',
         'url',
         'icon',
         'bookmark_category_id',

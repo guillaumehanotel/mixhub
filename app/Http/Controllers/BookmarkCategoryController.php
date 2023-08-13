@@ -36,7 +36,7 @@ class BookmarkCategoryController extends Controller
         $category->name = $validated['name'];
         $category->save();
 
-        return redirect()->route('bookmarks.show', $category->slug)->with('success', 'Catégorie mise à jour avec succès');
+        return redirect()->route('bookmarks.show', $category->slug);
     }
 
 

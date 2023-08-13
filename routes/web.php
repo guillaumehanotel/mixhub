@@ -43,12 +43,15 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'favoris', 'as' => 'bookmarks.'], function () {
         Route::get('/', [BookmarkController::class, 'index'])->name('index');
         Route::get('{bookmarkCategory}', [BookmarkController::class, 'show'])->name('show');
+        Route::post('/', [BookmarkController::class, 'store'])->name('store');
+        Route::put('{id}', [BookmarkController::class, 'update'])->name('update');
+        Route::delete('{id}', [BookmarkController::class, 'destroy'])->name('destroy');
     });
 
     Route::group(['prefix' => 'bookmark-categories', 'as' => 'bookmark-categories.'], function () {
         Route::post('/', [BookmarkCategoryController::class, 'store'])->name('store');
-        Route::put('{id}', [BookmarkCategoryController::class, 'update'])->name('update');
-        Route::delete('{id}', [BookmarkCategoryController::class, 'destroy'])->name('destroy');
+        Route::put('{slug}', [BookmarkCategoryController::class, 'update'])->name('update');
+        Route::delete('{slug}', [BookmarkCategoryController::class, 'destroy'])->name('destroy');
 
     });
 
