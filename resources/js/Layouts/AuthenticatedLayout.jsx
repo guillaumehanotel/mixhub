@@ -176,11 +176,13 @@ export default function Authenticated({user, children, errors}) {
                         </a>
                     </li>
                     <li className="h-12">
-                        <a onClick={handleLinkClick}>
+                        <Link href={route('hobbies.index')}
+                              className={!isCollapsed && url.includes('loisirs') ? 'active-link' : ''}
+                              onClick={handleLinkClick}>
                             <i className="fa-solid fa-house w-5 mr-3"></i>
                             <span
                                 className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>Loisirs</span>
-                        </a>
+                        </Link>
                     </li>
                     <li className="h-12">
                         <a onClick={handleLinkClick}>

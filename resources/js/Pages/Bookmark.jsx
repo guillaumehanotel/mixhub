@@ -64,7 +64,6 @@ export default function Bookmark({auth, bookmarks, bookmarkCategory}) {
     const handleCreateOrEditBookmark = async (e) => {
         e.preventDefault();
 
-        console.log(selectedBookmark);
         if (isEditing) {
             await router.put(route('bookmarks.update', selectedBookmark.id), {
                 title: newBookmarkTitle,

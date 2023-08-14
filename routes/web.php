@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookmarkCategoryController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HobbyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -52,9 +53,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [BookmarkCategoryController::class, 'store'])->name('store');
         Route::put('{slug}', [BookmarkCategoryController::class, 'update'])->name('update');
         Route::delete('{slug}', [BookmarkCategoryController::class, 'destroy'])->name('destroy');
-
     });
 
+    Route::group(['prefix' => 'loisirs', 'as' => 'hobbies.'], function () {
+        Route::get('/', [HobbyController::class, 'index'])->name('index');
+    });
 
 
 

@@ -14,6 +14,14 @@ return [
     |
     */
 
+    'google' => [
+        'api_key' => env('GOOGLE_API_KEY'),
+    ],
+
+    'rawg' => [
+        'api_key' => env('RAWG_API_KEY'),
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),
